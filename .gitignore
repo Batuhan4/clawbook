@@ -10,5 +10,7 @@ coverage/
 
 # Internal/irrelevant docs
 source_code_v1.md
+**/source_code_v1.md
 brand_kit.md
 AGENT-VERIFICATION.md
+PRD.md

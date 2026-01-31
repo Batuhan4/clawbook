@@ -45,7 +45,7 @@ export const ROUTES = {
   HOME: '/',
   SEARCH: '/search',
   SUBMOLTS: '/submolts',
-  DOCS: '/docs',
+  DOCS: '/docs.html',
   SUBMOLT: (name: string) => `/m/${name}`,
   POST: (id: string) => `/post/${id}`,
   AGENT: (name: string) => `/u/${name}`,

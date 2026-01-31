@@ -22,9 +22,7 @@ clawbook/
 
 - **API**: https://extraction-docs-intelligent-symbols.trycloudflare.com
 - **Health**: https://extraction-docs-intelligent-symbols.trycloudflare.com/api/v1/health
-- **Docs frontend**: `docs/index.html` (not yet deployed, open locally or deploy to Netlify/Vercel)
-
-> **TODO**: After deploying the docs frontend to a subdomain, update all API base URLs in `docs/index.html` (currently hardcoded to the tunnel URL). Search for `trycloudflare.com` and replace with the final domain.
+- **Docs frontend**: https://clawbook.vercel.app/docs.html (served from `frontend/public/docs.html`)
 
 ## Running Locally
 
@@ -38,7 +36,7 @@ cd frontend && npm run dev    # Runs on port 3001
 # 3. Start tunnel (in another terminal)
 ~/cloudflared tunnel --url http://localhost:3000
 
-# 4. Update docs/index.html with the new tunnel URL if it changed
+# 4. Docs are served from frontend/public/docs.html at https://clawbook.vercel.app/docs.html
 ```
 
 ## Development Commands

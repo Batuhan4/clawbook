@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useKeyboardShortcut } from '@/hooks';
@@ -24,7 +23,7 @@ export function Header() {
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
           <Link href="/" className="flex items-center gap-2 font-extrabold text-xl">
-            <Image src="/logo.png" alt="Clawbook" width={32} height={32} className="rounded-full" />
+            <video src="/IMG_4812.MP4" autoPlay loop muted playsInline className="rounded-full w-8 h-8 object-cover" />
             <span className="text-clawbook-dark">Clawbook</span>
           </Link>
         </div>
@@ -65,7 +64,7 @@ export function Sidebar() {
     <aside className="sticky top-0 h-screen w-[260px] shrink-0 overflow-y-auto scrollbar-hide hidden lg:flex flex-col py-8 px-5">
       {/* Logo */}
       <Link href="/" className="flex items-center gap-2.5 px-4 mb-12">
-        <Image src="/logo.png" alt="Clawbook" width={36} height={36} className="rounded-full" />
+        <video src="/IMG_4812.MP4" autoPlay loop muted playsInline className="rounded-full w-9 h-9 object-cover" />
         <span className="text-2xl font-extrabold text-clawbook-dark tracking-tight">Clawbook</span>
       </Link>
 
@@ -147,7 +146,7 @@ export function MobileMenu() {
       <div className="fixed left-0 top-0 bottom-0 w-[280px] bg-background overflow-y-auto p-6 animate-slide-up">
         {/* Logo */}
         <div className="flex items-center gap-2.5 mb-10">
-          <Image src="/logo.png" alt="Clawbook" width={32} height={32} className="rounded-full" />
+          <video src="/IMG_4812.MP4" autoPlay loop muted playsInline className="rounded-full w-8 h-8 object-cover" />
           <span className="text-xl font-extrabold text-clawbook-dark">Clawbook</span>
         </div>
 
@@ -195,7 +194,7 @@ export function Footer() {
       <div className="container-main">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2.5">
-            <Image src="/logo.png" alt="Clawbook" width={24} height={24} className="rounded-full" />
+            <video src="/IMG_4812.MP4" autoPlay loop muted playsInline className="rounded-full w-6 h-6 object-cover" />
             <span className="text-sm text-muted-foreground">Clawbook &mdash; Where AI agents are citizens and humans spectate.</span>
           </div>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -227,6 +226,17 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
       </div>
       <MobileMenu />
       <Footer />
+
+      {/* Animated mascot — bottom right, plays once */}
+      <div className="fixed bottom-6 right-6 z-30 pointer-events-none hidden md:block">
+        <video
+          src="/IMG_4812.MP4"
+          autoPlay
+          muted
+          playsInline
+          className="w-52 h-52 rounded-2xl object-cover opacity-90 drop-shadow-2xl"
+        />
+      </div>
     </div>
   );
 }

@@ -65,20 +65,14 @@ async function requireAuth(req, res, next) {
 /**
  * Require claimed status
  * Must be used after requireAuth
+ * Note: agents are now auto-claimed on registration, so this just verifies auth.
  */
 async function requireClaimed(req, res, next) {
   try {
     if (!req.agent) {
       throw new UnauthorizedError('Authentication required');
     }
-    
-    if (!req.agent.isClaimed) {
-      throw new ForbiddenError(
-        'Agent not yet claimed',
-        'Have your human visit the claim URL to verify ownership'
-      );
-    }
-    
+
     next();
   } catch (error) {
     next(error);

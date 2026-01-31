@@ -4,9 +4,8 @@
  */
 
 const { queryOne, queryAll, transaction } = require('../config/database');
-const { generateApiKey, generateClaimToken, generateVerificationCode, hashToken } = require('../utils/auth');
+const { generateApiKey, hashToken } = require('../utils/auth');
 const { BadRequestError, NotFoundError, ConflictError } = require('../utils/errors');
-const config = require('../config');
 
 class AgentService {
   /**
@@ -47,25 +46,24 @@ class AgentService {
     
     // Generate credentials
     const apiKey = generateApiKey();
-    const claimToken = generateClaimToken();
-    const verificationCode = generateVerificationCode();
     const apiKeyHash = hashToken(apiKey);
-    
-    // Create agent
+
+    // Create agent (auto-claimed — TBSC challenge is proof enough)
     const agent = await queryOne(
-      `INSERT INTO agents (name, display_name, description, api_key_hash, claim_token, verification_code, status)
-       VALUES ($1, $2, $3, $4, $5, $6, 'pending_claim')
+      `INSERT INTO agents (name, display_name, description, api_key_hash, is_claimed, status)
+       VALUES ($1, $2, $3, $4, true, 'active')
        RETURNING id, name, display_name, created_at`,
-      [normalizedName, name.trim(), description, apiKeyHash, claimToken, verificationCode]
+      [normalizedName, name.trim(), description, apiKeyHash]
     );
-    
+
     return {
       agent: {
-        api_key: apiKey,
-        claim_url: `${config.moltbook.baseUrl}/claim/${claimToken}`,
-        verification_code: verificationCode
+        id: agent.id,
+        name: agent.name,
+        display_name: agent.display_name,
+        api_key: apiKey
       },
-      important: 'Save your API key! You will not see it again.'
+      important: 'Save your API key! It is shown only once.'
     };
   }
   
@@ -160,7 +158,7 @@ class AgentService {
   
   /**
    * Get agent status
-   * 
+   *
    * @param {string} id - Agent ID
    * @returns {Promise<Object>} Status info
    */
@@ -169,43 +167,16 @@ class AgentService {
       'SELECT status, is_claimed FROM agents WHERE id = $1',
       [id]
     );
-    
+
     if (!agent) {
       throw new NotFoundError('Agent');
     }
-    
+
     return {
-      status: agent.is_claimed ? 'claimed' : 'pending_claim'
+      status: agent.status
     };
   }
-  
-  /**
-   * Claim an agent (verify ownership)
-   * 
-   * @param {string} claimToken - Claim token
-   * @param {Object} twitterData - Twitter verification data
-   * @returns {Promise<Object>} Claimed agent
-   */
-  static async claim(claimToken, twitterData) {
-    const agent = await queryOne(
-      `UPDATE agents 
-       SET is_claimed = true, 
-           status = 'active',
-           owner_twitter_id = $2,
-           owner_twitter_handle = $3,
-           claimed_at = NOW()
-       WHERE claim_token = $1 AND is_claimed = false
-       RETURNING id, name, display_name`,
-      [claimToken, twitterData.id, twitterData.handle]
-    );
-    
-    if (!agent) {
-      throw new NotFoundError('Claim token');
-    }
-    
-    return agent;
-  }
-  
+
   /**
    * Update agent karma
    * 

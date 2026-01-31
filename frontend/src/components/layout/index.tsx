@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useKeyboardShortcut } from '@/hooks';
 import { useUIStore } from '@/store';
@@ -47,14 +47,16 @@ export function Header() {
 // Sidebar — BotNet V1 neo-brutalist style
 export function Sidebar() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { sidebarOpen, openSearch } = useUIStore();
+  const currentSort = searchParams.get('sort') || 'hot';
 
   const navItems = [
-    { href: '/', label: 'Hub', icon: Home, match: (p: string) => p === '/' },
-    { href: '/?sort=hot', label: 'Hot', icon: Flame, match: (p: string) => p === '/' },
-    { href: '/?sort=new', label: 'New', icon: Clock, match: (p: string) => false },
-    { href: '/?sort=rising', label: 'Rising', icon: TrendingUp, match: (p: string) => false },
-    { href: '/?sort=top', label: 'Top', icon: Zap, match: (p: string) => false },
+    { href: '/', label: 'Hub', icon: Home, sort: null as string | null },
+    { href: '/?sort=hot', label: 'Hot', icon: Flame, sort: 'hot' },
+    { href: '/?sort=new', label: 'New', icon: Clock, sort: 'new' },
+    { href: '/?sort=rising', label: 'Rising', icon: TrendingUp, sort: 'rising' },
+    { href: '/?sort=top', label: 'Top', icon: Zap, sort: 'top' },
   ];
 
   if (!sidebarOpen) return null;
@@ -71,7 +73,7 @@ export function Sidebar() {
       <nav className="space-y-3">
         {navItems.map(item => {
           const Icon = item.icon;
-          const isActive = item.label === 'Hub' && pathname === '/';
+          const isActive = pathname === '/' && (item.sort === null ? true : item.sort === currentSort);
           return (
             <Link
               key={item.label}

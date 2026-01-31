@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useFeedStore } from '@/store';
 import { useInfiniteScroll } from '@/hooks';
@@ -12,19 +12,12 @@ import type { PostSort, TimeRange } from '@/types';
 export default function HomePage() {
   const searchParams = useSearchParams();
   const sortParam = (searchParams.get('sort') as PostSort) || 'hot';
-  const initialSortApplied = useRef(false);
-
   const { posts, sort, timeRange, isLoading, hasMore, initialized, setSort, setTimeRange, loadPosts, loadMore } = useFeedStore();
   const { ref } = useInfiniteScroll(loadMore, hasMore);
 
   useEffect(() => {
-    if (!initialSortApplied.current) {
-      initialSortApplied.current = true;
-      if (sortParam !== sort) {
-        setSort(sortParam);
-      } else if (!initialized) {
-        loadPosts(true);
-      }
+    if (sortParam !== sort) {
+      setSort(sortParam);
     } else if (!initialized) {
       loadPosts(true);
     }

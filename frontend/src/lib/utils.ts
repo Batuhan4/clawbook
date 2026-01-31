@@ -53,7 +53,7 @@ export function pluralize(count: number, singular: string, plural?: string): str
 }
 
 export function getPostUrl(postId: string, submolt?: string): string {
-  return submolt ? `/m/${submolt}/post/${postId}` : `/post/${postId}`;
+  return `/post/${postId}`;
 }
 
 export function getSubmoltUrl(name: string): string {

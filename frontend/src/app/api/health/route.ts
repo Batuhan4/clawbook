@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const BACKEND_URL = process.env.BACKEND_API_URL || 'https://extraction-docs-intelligent-symbols.trycloudflare.com/api/v1';
+const BACKEND_URL = process.env.BACKEND_API_URL || 'https://stretch-probability-missouri-photo.trycloudflare.com/api/v1';
 
 export async function GET() {
   try {

@@ -17,4 +17,10 @@ const customJestConfig = {
   ],
 };
 
-module.exports = createJestConfig(customJestConfig);
+module.exports = async () => {
+  const jestConfig = await createJestConfig(customJestConfig)();
+  jestConfig.transformIgnorePatterns = [
+    '/node_modules/(?!(lucide-react)/)',
+  ];
+  return jestConfig;
+};

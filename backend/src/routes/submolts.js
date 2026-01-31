@@ -5,7 +5,7 @@
 
 const { Router } = require('express');
 const { asyncHandler } = require('../middleware/errorHandler');
-const { requireAuth } = require('../middleware/auth');
+const { requireAuth, requireClaimed } = require('../middleware/auth');
 const { success, created, paginated } = require('../utils/response');
 const SubmoltService = require('../services/SubmoltService');
 const PostService = require('../services/PostService');
@@ -16,7 +16,7 @@ const router = Router();
  * GET /submolts
  * List all submolts
  */
-router.get('/', requireAuth, asyncHandler(async (req, res) => {
+router.get('/', requireAuth, requireClaimed, asyncHandler(async (req, res) => {
   const { limit = 50, offset = 0, sort = 'popular' } = req.query;
   
   const submolts = await SubmoltService.list({
@@ -32,7 +32,7 @@ router.get('/', requireAuth, asyncHandler(async (req, res) => {
  * POST /submolts
  * Create a new submolt
  */
-router.post('/', requireAuth, asyncHandler(async (req, res) => {
+router.post('/', requireAuth, requireClaimed, asyncHandler(async (req, res) => {
   const { name, display_name, description } = req.body;
   
   const submolt = await SubmoltService.create({
@@ -49,7 +49,7 @@ router.post('/', requireAuth, asyncHandler(async (req, res) => {
  * GET /submolts/:name
  * Get submolt info
  */
-router.get('/:name', requireAuth, asyncHandler(async (req, res) => {
+router.get('/:name', requireAuth, requireClaimed, asyncHandler(async (req, res) => {
   const submolt = await SubmoltService.findByName(req.params.name, req.agent.id);
   const isSubscribed = await SubmoltService.isSubscribed(submolt.id, req.agent.id);
   
@@ -65,7 +65,7 @@ router.get('/:name', requireAuth, asyncHandler(async (req, res) => {
  * PATCH /submolts/:name/settings
  * Update submolt settings
  */
-router.patch('/:name/settings', requireAuth, asyncHandler(async (req, res) => {
+router.patch('/:name/settings', requireAuth, requireClaimed, asyncHandler(async (req, res) => {
   const submolt = await SubmoltService.findByName(req.params.name);
   const { description, display_name, banner_color, theme_color } = req.body;
   
@@ -83,7 +83,7 @@ router.patch('/:name/settings', requireAuth, asyncHandler(async (req, res) => {
  * GET /submolts/:name/feed
  * Get posts in a submolt
  */
-router.get('/:name/feed', requireAuth, asyncHandler(async (req, res) => {
+router.get('/:name/feed', requireAuth, requireClaimed, asyncHandler(async (req, res) => {
   const { sort = 'hot', limit = 25, offset = 0 } = req.query;
   
   const posts = await PostService.getBySubmolt(req.params.name, {
@@ -99,7 +99,7 @@ router.get('/:name/feed', requireAuth, asyncHandler(async (req, res) => {
  * POST /submolts/:name/subscribe
  * Subscribe to a submolt
  */
-router.post('/:name/subscribe', requireAuth, asyncHandler(async (req, res) => {
+router.post('/:name/subscribe', requireAuth, requireClaimed, asyncHandler(async (req, res) => {
   const submolt = await SubmoltService.findByName(req.params.name);
   const result = await SubmoltService.subscribe(submolt.id, req.agent.id);
   success(res, result);
@@ -109,7 +109,7 @@ router.post('/:name/subscribe', requireAuth, asyncHandler(async (req, res) => {
  * DELETE /submolts/:name/subscribe
  * Unsubscribe from a submolt
  */
-router.delete('/:name/subscribe', requireAuth, asyncHandler(async (req, res) => {
+router.delete('/:name/subscribe', requireAuth, requireClaimed, asyncHandler(async (req, res) => {
   const submolt = await SubmoltService.findByName(req.params.name);
   const result = await SubmoltService.unsubscribe(submolt.id, req.agent.id);
   success(res, result);
@@ -119,7 +119,7 @@ router.delete('/:name/subscribe', requireAuth, asyncHandler(async (req, res) => 
  * GET /submolts/:name/moderators
  * Get submolt moderators
  */
-router.get('/:name/moderators', requireAuth, asyncHandler(async (req, res) => {
+router.get('/:name/moderators', requireAuth, requireClaimed, asyncHandler(async (req, res) => {
   const submolt = await SubmoltService.findByName(req.params.name);
   const moderators = await SubmoltService.getModerators(submolt.id);
   success(res, { moderators });
@@ -129,7 +129,7 @@ router.get('/:name/moderators', requireAuth, asyncHandler(async (req, res) => {
  * POST /submolts/:name/moderators
  * Add a moderator
  */
-router.post('/:name/moderators', requireAuth, asyncHandler(async (req, res) => {
+router.post('/:name/moderators', requireAuth, requireClaimed, asyncHandler(async (req, res) => {
   const submolt = await SubmoltService.findByName(req.params.name);
   const { agent_name, role } = req.body;
   
@@ -147,7 +147,7 @@ router.post('/:name/moderators', requireAuth, asyncHandler(async (req, res) => {
  * DELETE /submolts/:name/moderators
  * Remove a moderator
  */
-router.delete('/:name/moderators', requireAuth, asyncHandler(async (req, res) => {
+router.delete('/:name/moderators', requireAuth, requireClaimed, asyncHandler(async (req, res) => {
   const submolt = await SubmoltService.findByName(req.params.name);
   const { agent_name } = req.body;
   

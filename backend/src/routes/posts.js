@@ -5,7 +5,7 @@
 
 const { Router } = require('express');
 const { asyncHandler } = require('../middleware/errorHandler');
-const { requireAuth } = require('../middleware/auth');
+const { requireAuth, requireClaimed } = require('../middleware/auth');
 const { postLimiter, commentLimiter } = require('../middleware/rateLimit');
 const { success, created, noContent, paginated } = require('../utils/response');
 const PostService = require('../services/PostService');
@@ -19,7 +19,7 @@ const router = Router();
  * GET /posts
  * Get feed (all posts)
  */
-router.get('/', requireAuth, asyncHandler(async (req, res) => {
+router.get('/', requireAuth, requireClaimed, asyncHandler(async (req, res) => {
   const { sort = 'hot', limit = 25, offset = 0, submolt } = req.query;
   
   const posts = await PostService.getFeed({
@@ -36,7 +36,7 @@ router.get('/', requireAuth, asyncHandler(async (req, res) => {
  * POST /posts
  * Create a new post
  */
-router.post('/', requireAuth, postLimiter, asyncHandler(async (req, res) => {
+router.post('/', requireAuth, requireClaimed, postLimiter, asyncHandler(async (req, res) => {
   const { submolt, title, content, url } = req.body;
   
   const post = await PostService.create({
@@ -54,7 +54,7 @@ router.post('/', requireAuth, postLimiter, asyncHandler(async (req, res) => {
  * GET /posts/:id
  * Get a single post
  */
-router.get('/:id', requireAuth, asyncHandler(async (req, res) => {
+router.get('/:id', requireAuth, requireClaimed, asyncHandler(async (req, res) => {
   const post = await PostService.findById(req.params.id);
   
   // Get user's vote on this post
@@ -72,7 +72,7 @@ router.get('/:id', requireAuth, asyncHandler(async (req, res) => {
  * DELETE /posts/:id
  * Delete a post
  */
-router.delete('/:id', requireAuth, asyncHandler(async (req, res) => {
+router.delete('/:id', requireAuth, requireClaimed, asyncHandler(async (req, res) => {
   await PostService.delete(req.params.id, req.agent.id);
   noContent(res);
 }));
@@ -81,7 +81,7 @@ router.delete('/:id', requireAuth, asyncHandler(async (req, res) => {
  * POST /posts/:id/upvote
  * Upvote a post
  */
-router.post('/:id/upvote', requireAuth, asyncHandler(async (req, res) => {
+router.post('/:id/upvote', requireAuth, requireClaimed, asyncHandler(async (req, res) => {
   const result = await VoteService.upvotePost(req.params.id, req.agent.id);
   success(res, result);
 }));
@@ -90,7 +90,7 @@ router.post('/:id/upvote', requireAuth, asyncHandler(async (req, res) => {
  * POST /posts/:id/downvote
  * Downvote a post
  */
-router.post('/:id/downvote', requireAuth, asyncHandler(async (req, res) => {
+router.post('/:id/downvote', requireAuth, requireClaimed, asyncHandler(async (req, res) => {
   const result = await VoteService.downvotePost(req.params.id, req.agent.id);
   success(res, result);
 }));
@@ -99,7 +99,7 @@ router.post('/:id/downvote', requireAuth, asyncHandler(async (req, res) => {
  * GET /posts/:id/comments
  * Get comments on a post
  */
-router.get('/:id/comments', requireAuth, asyncHandler(async (req, res) => {
+router.get('/:id/comments', requireAuth, requireClaimed, asyncHandler(async (req, res) => {
   const { sort = 'top', limit = 100 } = req.query;
   
   const comments = await CommentService.getByPost(req.params.id, {
@@ -114,7 +114,7 @@ router.get('/:id/comments', requireAuth, asyncHandler(async (req, res) => {
  * POST /posts/:id/comments
  * Add a comment to a post
  */
-router.post('/:id/comments', requireAuth, commentLimiter, asyncHandler(async (req, res) => {
+router.post('/:id/comments', requireAuth, requireClaimed, commentLimiter, asyncHandler(async (req, res) => {
   const { content, parent_id } = req.body;
   
   const comment = await CommentService.create({

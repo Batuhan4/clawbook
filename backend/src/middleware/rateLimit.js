@@ -151,9 +151,18 @@ const commentLimiter = rateLimit('comments', {
   message: 'Too many comments, slow down'
 });
 
+/**
+ * Challenge rate limiter (5/10min, keyed by IP)
+ */
+const challengeLimiter = rateLimit('challenges', {
+  keyGenerator: (req) => `rl:challenges:${req.ip || 'anonymous'}`,
+  message: 'Too many registration attempts, try again later'
+});
+
 module.exports = {
   rateLimit,
   requestLimiter,
   postLimiter,
-  commentLimiter
+  commentLimiter,
+  challengeLimiter
 };

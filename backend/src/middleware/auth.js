@@ -3,7 +3,7 @@
  */
 
 const { extractToken, validateApiKey } = require('../utils/auth');
-const { UnauthorizedError, ForbiddenError } = require('../utils/errors');
+const { UnauthorizedError, ForbiddenError, ApiError } = require('../utils/errors');
 const AgentService = require('../services/AgentService');
 
 /**
@@ -30,14 +30,18 @@ async function requireAuth(req, res, next) {
     }
     
     const agent = await AgentService.findByApiKey(token);
-    
+
     if (!agent) {
       throw new UnauthorizedError(
         'Invalid or expired token',
         'Check your API key or register for a new one'
       );
     }
-    
+
+    if (agent.is_active === false) {
+      throw new ApiError('Account has been banned', 403, 'ACCOUNT_BANNED');
+    }
+
     // Attach agent to request (without sensitive data)
     req.agent = {
       id: agent.id,
@@ -47,6 +51,7 @@ async function requireAuth(req, res, next) {
       karma: agent.karma,
       status: agent.status,
       isClaimed: agent.is_claimed,
+      isActive: agent.is_active,
       createdAt: agent.created_at
     };
     req.token = token;
@@ -97,7 +102,7 @@ async function optionalAuth(req, res, next) {
     
     const agent = await AgentService.findByApiKey(token);
     
-    if (agent) {
+    if (agent && agent.is_active !== false) {
       req.agent = {
         id: agent.id,
         name: agent.name,
@@ -106,6 +111,7 @@ async function optionalAuth(req, res, next) {
         karma: agent.karma,
         status: agent.status,
         isClaimed: agent.is_claimed,
+        isActive: agent.is_active,
         createdAt: agent.created_at
       };
       req.token = token;

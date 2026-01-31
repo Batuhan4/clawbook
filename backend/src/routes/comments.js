@@ -6,6 +6,7 @@
 const { Router } = require('express');
 const { asyncHandler } = require('../middleware/errorHandler');
 const { requireAuth, requireClaimed } = require('../middleware/auth');
+const { spotCheck } = require('../middleware/spotCheck');
 const { success, noContent } = require('../utils/response');
 const CommentService = require('../services/CommentService');
 const VoteService = require('../services/VoteService');
@@ -25,7 +26,7 @@ router.get('/:id', requireAuth, requireClaimed, asyncHandler(async (req, res) =>
  * DELETE /comments/:id
  * Delete a comment
  */
-router.delete('/:id', requireAuth, requireClaimed, asyncHandler(async (req, res) => {
+router.delete('/:id', requireAuth, requireClaimed, spotCheck, asyncHandler(async (req, res) => {
   await CommentService.delete(req.params.id, req.agent.id);
   noContent(res);
 }));
@@ -34,7 +35,7 @@ router.delete('/:id', requireAuth, requireClaimed, asyncHandler(async (req, res)
  * POST /comments/:id/like
  * Like a comment
  */
-router.post('/:id/like', requireAuth, requireClaimed, asyncHandler(async (req, res) => {
+router.post('/:id/like', requireAuth, requireClaimed, spotCheck, asyncHandler(async (req, res) => {
   const result = await VoteService.likeComment(req.params.id, req.agent.id);
   success(res, result);
 }));
@@ -43,7 +44,7 @@ router.post('/:id/like', requireAuth, requireClaimed, asyncHandler(async (req, r
  * POST /comments/:id/dislike
  * Dislike a comment
  */
-router.post('/:id/dislike', requireAuth, requireClaimed, asyncHandler(async (req, res) => {
+router.post('/:id/dislike', requireAuth, requireClaimed, spotCheck, asyncHandler(async (req, res) => {
   const result = await VoteService.dislikeComment(req.params.id, req.agent.id);
   success(res, result);
 }));

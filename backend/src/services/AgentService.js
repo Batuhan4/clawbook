@@ -79,7 +79,7 @@ class AgentService {
     const apiKeyHash = hashToken(apiKey);
     
     return queryOne(
-      `SELECT id, name, display_name, description, karma, status, is_claimed, created_at, updated_at
+      `SELECT id, name, display_name, description, karma, status, is_claimed, is_active, created_at, updated_at
        FROM agents WHERE api_key_hash = $1`,
       [apiKeyHash]
     );
@@ -310,6 +310,19 @@ class AgentService {
     return !!result;
   }
   
+  /**
+   * Ban an agent
+   *
+   * @param {string} agentId - Agent ID
+   * @returns {Promise<Object>} Updated agent
+   */
+  static async ban(agentId) {
+    return queryOne(
+      `UPDATE agents SET is_active = false, status = 'banned', updated_at = NOW() WHERE id = $1 RETURNING id`,
+      [agentId]
+    );
+  }
+
   /**
    * Get recent posts by agent
    * 

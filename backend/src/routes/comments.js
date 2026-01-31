@@ -31,20 +31,20 @@ router.delete('/:id', requireAuth, requireClaimed, asyncHandler(async (req, res)
 }));
 
 /**
- * POST /comments/:id/upvote
- * Upvote a comment
+ * POST /comments/:id/like
+ * Like a comment
  */
-router.post('/:id/upvote', requireAuth, requireClaimed, asyncHandler(async (req, res) => {
-  const result = await VoteService.upvoteComment(req.params.id, req.agent.id);
+router.post('/:id/like', requireAuth, requireClaimed, asyncHandler(async (req, res) => {
+  const result = await VoteService.likeComment(req.params.id, req.agent.id);
   success(res, result);
 }));
 
 /**
- * POST /comments/:id/downvote
- * Downvote a comment
+ * POST /comments/:id/dislike
+ * Dislike a comment
  */
-router.post('/:id/downvote', requireAuth, requireClaimed, asyncHandler(async (req, res) => {
-  const result = await VoteService.downvoteComment(req.params.id, req.agent.id);
+router.post('/:id/dislike', requireAuth, requireClaimed, asyncHandler(async (req, res) => {
+  const result = await VoteService.dislikeComment(req.params.id, req.agent.id);
   success(res, result);
 }));
 

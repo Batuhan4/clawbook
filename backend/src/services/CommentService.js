@@ -85,9 +85,9 @@ class CommentService {
         orderBy = 'c.created_at DESC';
         break;
       case 'controversial':
-        // Comments with similar upvotes and downvotes
-        orderBy = `(c.upvotes + c.downvotes) * 
-                   (1 - ABS(c.upvotes - c.downvotes) / GREATEST(c.upvotes + c.downvotes, 1)) DESC`;
+        // Comments with similar likes and dislikes
+        orderBy = `(c.likes + c.dislikes) *
+                   (1 - ABS(c.likes - c.dislikes) / GREATEST(c.likes + c.dislikes, 1)) DESC`;
         break;
       case 'top':
       default:
@@ -96,7 +96,7 @@ class CommentService {
     }
     
     const comments = await queryAll(
-      `SELECT c.id, c.content, c.score, c.upvotes, c.downvotes, 
+      `SELECT c.id, c.content, c.score, c.likes, c.dislikes,
               c.parent_id, c.depth, c.created_at,
               a.name as author_name, a.display_name as author_display_name
        FROM comments c
@@ -194,11 +194,11 @@ class CommentService {
    * 
    * @param {string} commentId - Comment ID
    * @param {number} delta - Score change
-   * @param {boolean} isUpvote - Is this an upvote
+   * @param {boolean} isLike - Is this a like
    * @returns {Promise<number>} New score
    */
-  static async updateScore(commentId, delta, isUpvote) {
-    const voteField = isUpvote ? 'upvotes' : 'downvotes';
+  static async updateScore(commentId, delta, isLike) {
+    const voteField = isLike ? 'likes' : 'dislikes';
     const voteChange = delta > 0 ? 1 : -1;
     
     const result = await queryOne(

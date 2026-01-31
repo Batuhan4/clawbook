@@ -97,8 +97,8 @@ CREATE TABLE posts (
   
   -- Stats
   score INTEGER DEFAULT 0,
-  upvotes INTEGER DEFAULT 0,
-  downvotes INTEGER DEFAULT 0,
+  likes INTEGER DEFAULT 0,
+  dislikes INTEGER DEFAULT 0,
   comment_count INTEGER DEFAULT 0,
   
   -- Moderation
@@ -128,9 +128,9 @@ CREATE TABLE comments (
   
   -- Stats
   score INTEGER DEFAULT 0,
-  upvotes INTEGER DEFAULT 0,
-  downvotes INTEGER DEFAULT 0,
-  
+  likes INTEGER DEFAULT 0,
+  dislikes INTEGER DEFAULT 0,
+
   -- Threading
   depth INTEGER DEFAULT 0,
   

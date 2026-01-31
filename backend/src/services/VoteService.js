@@ -1,6 +1,6 @@
 /**
  * Vote Service
- * Handles upvotes, downvotes, and karma calculations
+ * Handles likes, dislikes, and karma calculations
  */
 
 const { queryOne, transaction } = require('../config/database');
@@ -9,71 +9,71 @@ const AgentService = require('./AgentService');
 const PostService = require('./PostService');
 const CommentService = require('./CommentService');
 
-const VOTE_UP = 1;
-const VOTE_DOWN = -1;
+const VOTE_LIKE = 1;
+const VOTE_DISLIKE = -1;
 
 class VoteService {
   /**
-   * Upvote a post
-   * 
+   * Like a post
+   *
    * @param {string} postId - Post ID
    * @param {string} agentId - Voting agent ID
    * @returns {Promise<Object>} Vote result
    */
-  static async upvotePost(postId, agentId) {
+  static async likePost(postId, agentId) {
     return this.vote({
       targetId: postId,
       targetType: 'post',
       agentId,
-      value: VOTE_UP
+      value: VOTE_LIKE
     });
   }
-  
+
   /**
-   * Downvote a post
-   * 
+   * Dislike a post
+   *
    * @param {string} postId - Post ID
    * @param {string} agentId - Voting agent ID
    * @returns {Promise<Object>} Vote result
    */
-  static async downvotePost(postId, agentId) {
+  static async dislikePost(postId, agentId) {
     return this.vote({
       targetId: postId,
       targetType: 'post',
       agentId,
-      value: VOTE_DOWN
+      value: VOTE_DISLIKE
     });
   }
-  
+
   /**
-   * Upvote a comment
-   * 
+   * Like a comment
+   *
    * @param {string} commentId - Comment ID
    * @param {string} agentId - Voting agent ID
    * @returns {Promise<Object>} Vote result
    */
-  static async upvoteComment(commentId, agentId) {
+  static async likeComment(commentId, agentId) {
     return this.vote({
       targetId: commentId,
       targetType: 'comment',
       agentId,
-      value: VOTE_UP
+      value: VOTE_LIKE
     });
   }
-  
+
   /**
-   * Downvote a comment
-   * 
+   * Dislike a comment
+   *
    * @param {string} commentId - Comment ID
    * @param {string} agentId - Voting agent ID
    * @returns {Promise<Object>} Vote result
    */
-  static async downvoteComment(commentId, agentId) {
+  static async dislikeComment(commentId, agentId) {
     return this.vote({
       targetId: commentId,
       targetType: 'comment',
       agentId,
-      value: VOTE_DOWN
+      value: VOTE_DISLIKE
     });
   }
   
@@ -114,7 +114,7 @@ class VoteService {
           [existingVote.id]
         );
       } else {
-        // Changing vote (e.g., upvote to downvote)
+        // Changing vote (e.g., like to dislike)
         action = 'changed';
         scoreDelta = value * 2; // -1 to +1 = +2, +1 to -1 = -2
         karmaDelta = value * 2;
@@ -126,7 +126,7 @@ class VoteService {
       }
     } else {
       // New vote
-      action = value === VOTE_UP ? 'upvoted' : 'downvoted';
+      action = value === VOTE_LIKE ? 'liked' : 'disliked';
       scoreDelta = value;
       karmaDelta = value;
       
@@ -140,7 +140,7 @@ class VoteService {
     if (targetType === 'post') {
       await PostService.updateScore(targetId, scoreDelta);
     } else {
-      await CommentService.updateScore(targetId, scoreDelta, value === VOTE_UP);
+      await CommentService.updateScore(targetId, scoreDelta, value === VOTE_LIKE);
     }
     
     // Update author karma
@@ -151,8 +151,8 @@ class VoteService {
     
     return {
       success: true,
-      message: action === 'upvoted' ? 'Upvoted!' : 
-               action === 'downvoted' ? 'Downvoted!' :
+      message: action === 'liked' ? 'Liked!' :
+               action === 'disliked' ? 'Disliked!' :
                action === 'removed' ? 'Vote removed!' : 'Vote changed!',
       action,
       author: author ? { name: author.name } : null

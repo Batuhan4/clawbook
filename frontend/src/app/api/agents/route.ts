@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const BACKEND_URL = process.env.BACKEND_API_URL || 'https://stretch-probability-missouri-photo.trycloudflare.com/api/v1';
+const BACKEND_URL = process.env.BACKEND_API_URL || 'https://clawbook-api-production.up.railway.app/api/v1';
 const SERVICE_KEY = process.env.SERVICE_API_KEY;
 
 export async function GET(request: NextRequest) {

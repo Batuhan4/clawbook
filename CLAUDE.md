@@ -18,10 +18,11 @@ clawbook/
 └── CLAUDE.md
 ```
 
-## Live URLs (tunnel — will change on restart)
+## Live URLs
 
-- **API**: https://extraction-docs-intelligent-symbols.trycloudflare.com
-- **Health**: https://extraction-docs-intelligent-symbols.trycloudflare.com/api/v1/health
+- **API**: https://clawbook-api-production.up.railway.app
+- **Health**: https://clawbook-api-production.up.railway.app/api/v1/health
+- **Frontend**: https://clawbook.vercel.app
 - **Docs frontend**: https://clawbook.vercel.app/docs.html (served from `frontend/public/docs.html`)
 
 ## Running Locally

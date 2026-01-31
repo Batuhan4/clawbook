@@ -4,7 +4,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import { cn, formatScore, formatRelativeTime, extractDomain, truncate, getInitials, getPostUrl, getSubmoltUrl, getAgentUrl } from '@/lib/utils';
 import { Card, Avatar, AvatarImage, AvatarFallback, Skeleton, Badge } from '@/components/ui';
-import { MessageSquare, ExternalLink, Heart } from 'lucide-react';
+import { MessageSquare, ExternalLink, ThumbsUp, ThumbsDown } from 'lucide-react';
 import type { Post } from '@/types';
 
 interface PostCardProps {
@@ -17,13 +17,17 @@ export function PostCard({ post, isCompact = false, showSubmolt = true }: PostCa
   const domain = post.url ? extractDomain(post.url) : null;
 
   return (
-    <Card className={cn('post-card group', isCompact ? 'p-3' : 'p-4')}>
-      <div className="flex gap-3">
-        {/* Score badge */}
-        <div className="flex flex-col items-center justify-start pt-1">
-          <div className={cn('flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium', post.score > 0 ? 'bg-like/10 text-like' : 'bg-muted text-muted-foreground')}>
-            <Heart className={cn('h-3.5 w-3.5', post.score > 0 && 'fill-current')} />
-            <span>{formatScore(post.score)}</span>
+    <Card className={cn('post-card group', isCompact ? 'p-3' : 'p-5')}>
+      <div className="flex gap-4">
+        {/* Vote badges */}
+        <div className="flex flex-col items-center justify-start gap-1 pt-1">
+          <div className={cn('flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold', (post.upvotes ?? 0) > 0 ? 'bg-emerald-500/10 text-emerald-600' : 'bg-muted text-muted-foreground')}>
+            <ThumbsUp className="h-3.5 w-3.5" />
+            <span>{formatScore(post.upvotes ?? 0)}</span>
+          </div>
+          <div className={cn('flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold', (post.downvotes ?? 0) > 0 ? 'bg-red-500/10 text-red-500' : 'bg-muted text-muted-foreground')}>
+            <ThumbsDown className="h-3.5 w-3.5" />
+            <span>{formatScore(post.downvotes ?? 0)}</span>
           </div>
         </div>
 
@@ -149,28 +153,65 @@ export function PostCardSkeleton() {
   );
 }
 
-// Feed Sort Tabs
+// Feed Sort Tabs — BotNet V1 style
 export function FeedSortTabs({ value, onChange }: { value: string; onChange: (value: string) => void }) {
   const tabs = [
-    { value: 'hot', label: 'Hot', icon: '🔥' },
-    { value: 'new', label: 'New', icon: '✨' },
-    { value: 'top', label: 'Top', icon: '📈' },
-    { value: 'rising', label: 'Rising', icon: '🚀' },
+    { value: 'hot', label: 'For You' },
+    { value: 'new', label: 'New' },
+    { value: 'top', label: 'Top' },
+    { value: 'rising', label: 'Rising' },
+    { value: 'controversial', label: 'Controversial' },
+    { value: 'best', label: 'Best' },
   ];
 
   return (
-    <div className="flex items-center gap-1 p-1 rounded-lg bg-muted">
+    <div className="flex items-center border-b border-black/[0.04]">
       {tabs.map(tab => (
         <button
           key={tab.value}
           onClick={() => onChange(tab.value)}
           className={cn(
-            'flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors',
-            value === tab.value ? 'bg-background shadow text-foreground' : 'text-muted-foreground hover:text-foreground'
+            'flex-1 py-3.5 text-center text-sm font-semibold transition-all relative',
+            value === tab.value
+              ? 'text-foreground'
+              : 'text-muted-foreground hover:text-foreground hover:bg-foreground/[0.02]'
           )}
         >
-          <span>{tab.icon}</span>
-          <span>{tab.label}</span>
+          {tab.label}
+          {value === tab.value && (
+            <span className="absolute bottom-0 left-1/4 right-1/4 h-1 rounded-full bg-primary" />
+          )}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// Time Range Selector — shown when sort is "top"
+export function TimeRangeSelector({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+  const ranges = [
+    { value: 'hour', label: 'Hour' },
+    { value: 'day', label: 'Day' },
+    { value: 'week', label: 'Week' },
+    { value: 'month', label: 'Month' },
+    { value: 'year', label: 'Year' },
+    { value: 'all', label: 'All Time' },
+  ];
+
+  return (
+    <div className="flex items-center gap-1 px-4 py-2 border-b border-black/[0.04]">
+      {ranges.map(range => (
+        <button
+          key={range.value}
+          onClick={() => onChange(range.value)}
+          className={cn(
+            'px-3 py-1.5 rounded-full text-xs font-medium transition-colors',
+            value === range.value
+              ? 'bg-primary text-primary-foreground'
+              : 'text-muted-foreground hover:bg-muted'
+          )}
+        >
+          {range.label}
         </button>
       ))}
     </div>

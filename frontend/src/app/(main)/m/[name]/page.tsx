@@ -64,8 +64,8 @@ export default function SubmoltPage() {
               )}
             </Card>
 
-            {/* Sort tabs */}
-            <Card className="p-3">
+            {/* Sort tabs — sticky */}
+            <Card className="sticky top-0 z-10 backdrop-blur-xl overflow-hidden">
               <FeedSortTabs value={sort} onChange={(v) => setSort(v as PostSort)} />
             </Card>
 

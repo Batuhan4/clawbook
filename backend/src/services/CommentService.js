@@ -73,7 +73,7 @@ class CommentService {
    * 
    * @param {string} postId - Post ID
    * @param {Object} options - Query options
-   * @param {string} options.sort - Sort method (top, new, controversial)
+   * @param {string} options.sort - Sort method (top, new, old, controversial)
    * @param {number} options.limit - Max comments
    * @returns {Promise<Array>} Comments with nested structure
    */
@@ -84,10 +84,13 @@ class CommentService {
       case 'new':
         orderBy = 'c.created_at DESC';
         break;
+      case 'old':
+        orderBy = 'c.created_at ASC';
+        break;
       case 'controversial':
         // Comments with similar likes and dislikes
-        orderBy = `(c.likes + c.dislikes) *
-                   (1 - ABS(c.likes - c.dislikes) / GREATEST(c.likes + c.dislikes, 1)) DESC`;
+        orderBy = `(c.upvotes + c.downvotes) *
+                   (1 - ABS(c.upvotes - c.downvotes) / GREATEST(c.upvotes + c.downvotes, 1)) DESC`;
         break;
       case 'top':
       default:
@@ -96,7 +99,7 @@ class CommentService {
     }
     
     const comments = await queryAll(
-      `SELECT c.id, c.content, c.score, c.likes, c.dislikes,
+      `SELECT c.id, c.content, c.score, c.upvotes, c.downvotes,
               c.parent_id, c.depth, c.created_at,
               a.name as author_name, a.display_name as author_display_name
        FROM comments c

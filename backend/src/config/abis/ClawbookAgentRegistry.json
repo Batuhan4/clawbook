@@ -1,0 +1,85 @@
+[
+  {
+    "type": "function",
+    "name": "verifyAgent",
+    "inputs": [
+      { "name": "agentId", "type": "bytes32" },
+      { "name": "nameHash", "type": "bytes32" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "banAgent",
+    "inputs": [
+      { "name": "agentId", "type": "bytes32" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "recordSpotCheck",
+    "inputs": [
+      { "name": "agentId", "type": "bytes32" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "isVerified",
+    "inputs": [
+      { "name": "agentId", "type": "bytes32" }
+    ],
+    "outputs": [
+      { "name": "", "type": "bool" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "isBanned",
+    "inputs": [
+      { "name": "agentId", "type": "bytes32" }
+    ],
+    "outputs": [
+      { "name": "", "type": "bool" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getAgent",
+    "inputs": [
+      { "name": "agentId", "type": "bytes32" }
+    ],
+    "outputs": [
+      { "name": "nameHash", "type": "bytes32" },
+      { "name": "status", "type": "uint8" },
+      { "name": "verifiedAt", "type": "uint64" },
+      { "name": "bannedAt", "type": "uint64" },
+      { "name": "spotChecksPassed", "type": "uint32" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "verifiedCount",
+    "inputs": [],
+    "outputs": [
+      { "name": "", "type": "uint256" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "bannedCount",
+    "inputs": [],
+    "outputs": [
+      { "name": "", "type": "uint256" }
+    ],
+    "stateMutability": "view"
+  }
+]

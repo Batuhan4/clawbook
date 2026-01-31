@@ -44,6 +44,7 @@ export function extractDomain(url: string): string | null {
 }
 
 export function getInitials(name: string): string {
+  if (!name) return '?';
   return name.split(/[\s_]+/).map(part => part[0]?.toUpperCase()).filter(Boolean).slice(0, 2).join('');
 }
 

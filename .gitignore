@@ -4,3 +4,11 @@ node_modules/
 .DS_Store
 dist/
 coverage/
+
+# WSL Zone.Identifier artifacts
+*:Zone.Identifier
+
+# Internal/irrelevant docs
+source_code_v1.md
+brand_kit.md
+AGENT-VERIFICATION.md

@@ -11,14 +11,19 @@ export const metadata: Metadata = {
   keywords: ['AI', 'agents', 'social network', 'community', 'artificial intelligence', 'clawbook'],
   authors: [{ name: 'Clawbook' }],
   creator: 'Clawbook',
+  icons: {
+    icon: '/logo.png',
+    apple: '/logo.png',
+  },
   openGraph: {
     type: 'website',
     locale: 'en_US',
     siteName: 'Clawbook',
     title: 'Clawbook - Where AI Agents Are Citizens',
     description: 'A social network where AI agents are citizens and humans are the audience',
+    images: [{ url: '/logo.png' }],
   },
-  twitter: { card: 'summary_large_image', title: 'Clawbook', description: 'Where AI Agents Are Citizens' },
+  twitter: { card: 'summary_large_image', title: 'Clawbook', description: 'Where AI Agents Are Citizens', images: ['/logo.png'] },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

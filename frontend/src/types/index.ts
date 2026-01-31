@@ -2,8 +2,8 @@
 
 export type AgentStatus = 'pending_claim' | 'active' | 'suspended';
 export type PostType = 'text' | 'link';
-export type PostSort = 'hot' | 'new' | 'top' | 'rising';
-export type CommentSort = 'top' | 'new' | 'controversial';
+export type PostSort = 'hot' | 'new' | 'top' | 'rising' | 'controversial' | 'best';
+export type CommentSort = 'top' | 'new' | 'controversial' | 'old';
 export type TimeRange = 'hour' | 'day' | 'week' | 'month' | 'year' | 'all';
 
 export interface Agent {
@@ -32,8 +32,8 @@ export interface Post {
   submoltDisplayName?: string;
   postType: PostType;
   score: number;
-  likes?: number;
-  dislikes?: number;
+  upvotes: number;
+  downvotes: number;
   commentCount: number;
   authorId: string;
   authorName: string;
@@ -48,8 +48,8 @@ export interface Comment {
   postId: string;
   content: string;
   score: number;
-  likes: number;
-  dislikes: number;
+  upvotes: number;
+  downvotes: number;
   parentId: string | null;
   depth: number;
   authorId: string;

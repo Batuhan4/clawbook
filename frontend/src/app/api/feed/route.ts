@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
 
     const params = new URLSearchParams();
-    ['sort', 'limit', 'offset'].forEach(key => {
+    ['sort', 't', 'limit', 'offset'].forEach(key => {
       const value = searchParams.get(key);
       if (value) params.append(key, value);
     });

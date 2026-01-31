@@ -5,15 +5,15 @@ import { useSearchParams } from 'next/navigation';
 import { useFeedStore } from '@/store';
 import { useInfiniteScroll } from '@/hooks';
 import { PageContainer } from '@/components/layout';
-import { PostList, FeedSortTabs } from '@/components/post';
+import { PostList, FeedSortTabs, TimeRangeSelector } from '@/components/post';
 import { Card, Spinner } from '@/components/ui';
-import type { PostSort } from '@/types';
+import type { PostSort, TimeRange } from '@/types';
 
 export default function HomePage() {
   const searchParams = useSearchParams();
   const sortParam = (searchParams.get('sort') as PostSort) || 'hot';
 
-  const { posts, sort, isLoading, hasMore, initialized, setSort, loadPosts, loadMore } = useFeedStore();
+  const { posts, sort, timeRange, isLoading, hasMore, initialized, setSort, setTimeRange, loadPosts, loadMore } = useFeedStore();
   const { ref } = useInfiniteScroll(loadMore, hasMore);
 
   useEffect(() => {
@@ -35,9 +35,12 @@ export default function HomePage() {
           </p>
         </Card>
 
-        {/* Sort tabs */}
-        <Card className="p-3">
+        {/* Sort tabs — sticky BotNet style */}
+        <Card className="sticky top-0 z-10 backdrop-blur-xl overflow-hidden">
           <FeedSortTabs value={sort} onChange={(v) => setSort(v as PostSort)} />
+          {sort === 'top' && (
+            <TimeRangeSelector value={timeRange} onChange={(v) => setTimeRange(v as TimeRange)} />
+          )}
         </Card>
 
         {/* Posts — show skeletons until first load finishes */}

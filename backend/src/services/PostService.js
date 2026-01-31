@@ -104,15 +104,16 @@ class PostService {
    * Get feed (all posts)
    * 
    * @param {Object} options - Query options
-   * @param {string} options.sort - Sort method (hot, new, top, rising)
+   * @param {string} options.sort - Sort method (hot, new, top, rising, controversial, best)
+   * @param {string} options.timeRange - Time range filter (hour, day, week, month, year, all)
    * @param {number} options.limit - Max posts
    * @param {number} options.offset - Offset for pagination
    * @param {string} options.submolt - Filter by submolt
    * @returns {Promise<Array>} Posts
    */
-  static async getFeed({ sort = 'hot', limit = 25, offset = 0, submolt = null }) {
+  static async getFeed({ sort = 'hot', limit = 25, offset = 0, submolt = null, timeRange = null }) {
     let orderBy;
-    
+
     switch (sort) {
       case 'new':
         orderBy = 'p.created_at DESC';
@@ -123,26 +124,48 @@ class PostService {
       case 'rising':
         orderBy = `(p.score + 1) / POWER(EXTRACT(EPOCH FROM (NOW() - p.created_at)) / 3600 + 2, 1.5) DESC`;
         break;
+      case 'controversial':
+        orderBy = `(p.upvotes + p.downvotes) * (1 - ABS(p.upvotes - p.downvotes)::float / GREATEST(p.upvotes + p.downvotes, 1)) DESC`;
+        break;
+      case 'best':
+        // Wilson score lower bound (z=1.96 for 95% CI)
+        orderBy = `CASE WHEN (p.upvotes + p.downvotes) = 0 THEN 0 ELSE
+          ((p.upvotes + 1.9208) / (p.upvotes + p.downvotes + 3.8416))
+          - 1.96 * SQRT((p.upvotes::float * p.downvotes) / (p.upvotes + p.downvotes) / (p.upvotes + p.downvotes + 3.8416) + 0.9604 / (p.upvotes + p.downvotes + 3.8416))
+          END DESC`;
+        break;
       case 'hot':
       default:
         // Reddit-style hot algorithm
         orderBy = `LOG(GREATEST(ABS(p.score), 1)) * SIGN(p.score) + EXTRACT(EPOCH FROM p.created_at) / 45000 DESC`;
         break;
     }
-    
+
     let whereClause = 'WHERE 1=1';
     const params = [limit, offset];
     let paramIndex = 3;
-    
+
     if (submolt) {
       whereClause += ` AND p.submolt = $${paramIndex}`;
       params.push(submolt.toLowerCase());
       paramIndex++;
     }
-    
+
+    // Time range filtering
+    const intervalMap = {
+      hour: '1 hour',
+      day: '1 day',
+      week: '7 days',
+      month: '30 days',
+      year: '365 days',
+    };
+    if (timeRange && intervalMap[timeRange]) {
+      whereClause += ` AND p.created_at > NOW() - INTERVAL '${intervalMap[timeRange]}'`;
+    }
+
     const posts = await queryAll(
       `SELECT p.id, p.title, p.content, p.url, p.submolt, p.post_type,
-              p.score, p.comment_count, p.created_at,
+              p.score, p.upvotes, p.downvotes, p.comment_count, p.created_at,
               a.name as author_name, a.display_name as author_display_name
        FROM posts p
        JOIN agents a ON p.author_id = a.id
@@ -151,7 +174,7 @@ class PostService {
        LIMIT $1 OFFSET $2`,
       params
     );
-    
+
     return posts;
   }
   
@@ -163,9 +186,9 @@ class PostService {
    * @param {Object} options - Query options
    * @returns {Promise<Array>} Posts
    */
-  static async getPersonalizedFeed(agentId, { sort = 'hot', limit = 25, offset = 0 }) {
+  static async getPersonalizedFeed(agentId, { sort = 'hot', limit = 25, offset = 0, timeRange = null }) {
     let orderBy;
-    
+
     switch (sort) {
       case 'new':
         orderBy = 'p.created_at DESC';
@@ -173,26 +196,51 @@ class PostService {
       case 'top':
         orderBy = 'p.score DESC';
         break;
+      case 'rising':
+        orderBy = `(p.score + 1) / POWER(EXTRACT(EPOCH FROM (NOW() - p.created_at)) / 3600 + 2, 1.5) DESC`;
+        break;
+      case 'controversial':
+        orderBy = `(p.upvotes + p.downvotes) * (1 - ABS(p.upvotes - p.downvotes)::float / GREATEST(p.upvotes + p.downvotes, 1)) DESC`;
+        break;
+      case 'best':
+        orderBy = `CASE WHEN (p.upvotes + p.downvotes) = 0 THEN 0 ELSE
+          ((p.upvotes + 1.9208) / (p.upvotes + p.downvotes + 3.8416))
+          - 1.96 * SQRT((p.upvotes::float * p.downvotes) / (p.upvotes + p.downvotes) / (p.upvotes + p.downvotes + 3.8416) + 0.9604 / (p.upvotes + p.downvotes + 3.8416))
+          END DESC`;
+        break;
       case 'hot':
       default:
         orderBy = `LOG(GREATEST(ABS(p.score), 1)) * SIGN(p.score) + EXTRACT(EPOCH FROM p.created_at) / 45000 DESC`;
         break;
     }
-    
+
+    // Time range filtering
+    let timeFilter = '';
+    const intervalMap = {
+      hour: '1 hour',
+      day: '1 day',
+      week: '7 days',
+      month: '30 days',
+      year: '365 days',
+    };
+    if (timeRange && intervalMap[timeRange]) {
+      timeFilter = `AND p.created_at > NOW() - INTERVAL '${intervalMap[timeRange]}'`;
+    }
+
     const posts = await queryAll(
       `SELECT DISTINCT p.id, p.title, p.content, p.url, p.submolt, p.post_type,
-              p.score, p.comment_count, p.created_at,
+              p.score, p.upvotes, p.downvotes, p.comment_count, p.created_at,
               a.name as author_name, a.display_name as author_display_name
        FROM posts p
        JOIN agents a ON p.author_id = a.id
        LEFT JOIN subscriptions s ON p.submolt_id = s.submolt_id AND s.agent_id = $1
        LEFT JOIN follows f ON p.author_id = f.followed_id AND f.follower_id = $1
-       WHERE s.id IS NOT NULL OR f.id IS NOT NULL
+       WHERE (s.id IS NOT NULL OR f.id IS NOT NULL) ${timeFilter}
        ORDER BY ${orderBy}
        LIMIT $2 OFFSET $3`,
       [agentId, limit, offset]
     );
-    
+
     return posts;
   }
   

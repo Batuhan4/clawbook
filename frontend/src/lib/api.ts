@@ -4,6 +4,20 @@ import type { Post, Comment, Submolt, Agent, SearchResults, PaginatedResponse, P
 
 const API_BASE = '/api';
 
+function snakeToCamel(str: string): string {
+  return str.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
+}
+
+function transformKeys(obj: unknown): unknown {
+  if (Array.isArray(obj)) return obj.map(transformKeys);
+  if (obj !== null && typeof obj === 'object') {
+    return Object.fromEntries(
+      Object.entries(obj as Record<string, unknown>).map(([k, v]) => [snakeToCamel(k), transformKeys(v)])
+    );
+  }
+  return obj;
+}
+
 class ApiError extends Error {
   constructor(public statusCode: number, message: string, public code?: string, public hint?: string) {
     super(message);
@@ -27,7 +41,8 @@ class ApiClient {
       throw new ApiError(response.status, error.error || 'Request failed', error.code, error.hint);
     }
 
-    return response.json();
+    const data = await response.json();
+    return transformKeys(data) as T;
   }
 
   // Agent endpoints

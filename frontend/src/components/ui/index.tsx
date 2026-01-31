@@ -10,22 +10,22 @@ import { X, Loader2 } from 'lucide-react';
 
 // Button
 const buttonVariants = cva(
-  'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center justify-center whitespace-nowrap rounded-2xl text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground shadow hover:bg-primary/90',
-        destructive: 'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90',
-        outline: 'border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground',
-        secondary: 'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80',
-        ghost: 'hover:bg-accent hover:text-accent-foreground',
+        default: 'bg-primary text-primary-foreground hover:bg-primary/90 btn-neo',
+        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+        outline: 'border-2 border-foreground/10 bg-card hover:bg-foreground/[0.04] hover:border-foreground/20',
+        secondary: 'bg-muted text-secondary-foreground hover:bg-muted/80',
+        ghost: 'hover:bg-foreground/[0.04]',
         link: 'text-primary underline-offset-4 hover:underline',
       },
       size: {
-        default: 'h-9 px-4 py-2',
-        sm: 'h-8 rounded-md px-3 text-xs',
-        lg: 'h-10 rounded-md px-8',
-        icon: 'h-9 w-9',
+        default: 'h-10 px-5 py-2',
+        sm: 'h-8 rounded-xl px-3 text-xs',
+        lg: 'h-12 rounded-2xl px-8 text-base',
+        icon: 'h-10 w-10 rounded-xl',
       },
     },
     defaultVariants: { variant: 'default', size: 'default' },
@@ -52,7 +52,7 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(({ className, type, ...props }, ref) => (
   <input
     type={type}
-    className={cn('flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50', className)}
+    className={cn('flex h-10 w-full rounded-xl border border-input bg-card px-4 py-2 text-sm transition-all placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50', className)}
     ref={ref}
     {...props}
   />
@@ -81,14 +81,14 @@ AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName;
 
 // Badge
 const badgeVariants = cva(
-  'inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+  'inline-flex items-center rounded-full border px-3 py-0.5 text-xs font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
   {
     variants: {
       variant: {
-        default: 'border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80',
-        secondary: 'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        destructive: 'border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80',
-        outline: 'text-foreground',
+        default: 'border-transparent bg-primary text-primary-foreground hover:bg-primary/80',
+        secondary: 'border-transparent bg-muted text-secondary-foreground hover:bg-muted/80',
+        destructive: 'border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80',
+        outline: 'text-foreground border-foreground/20',
       },
     },
     defaultVariants: { variant: 'default' },
@@ -103,7 +103,7 @@ export function Badge({ className, variant, ...props }: BadgeProps) {
 
 // Card
 export const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn('rounded-xl border bg-card text-card-foreground shadow', className)} {...props} />
+  <div ref={ref} className={cn('rounded-2xl bg-card text-card-foreground', className)} style={{ border: '1px solid rgba(0,0,0,0.04)' }} {...props} />
 ));
 Card.displayName = 'Card';
 
@@ -193,7 +193,7 @@ TooltipContent.displayName = TooltipPrimitive.Content.displayName;
 
 // Skeleton
 export function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('animate-pulse rounded-md bg-primary/10', className)} {...props} />;
+  return <div className={cn('animate-pulse rounded-xl bg-muted', className)} {...props} />;
 }
 
 // Spinner

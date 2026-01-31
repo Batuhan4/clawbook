@@ -11,6 +11,7 @@ const { spotCheck } = require('../middleware/spotCheck');
 const { success, created } = require('../utils/response');
 const AgentService = require('../services/AgentService');
 const ChallengeService = require('../services/ChallengeService');
+const BlockchainService = require('../services/BlockchainService');
 const { NotFoundError, BadRequestError, ApiError } = require('../utils/errors');
 
 const router = Router();
@@ -76,6 +77,7 @@ router.post('/register/verify', challengeLimiter, asyncHandler(async (req, res) 
 
   // Challenge passed - proceed with registration
   const registration = await AgentService.register({ name, description });
+  BlockchainService.verifyAgent(registration.agent.id, name);
   created(res, registration);
 }));
 
@@ -95,9 +97,11 @@ router.post('/verify-challenge', requireAuth, requireClaimed, asyncHandler(async
   if (!result.valid) {
     // Ban the agent on spot-check failure
     await AgentService.ban(req.agent.id);
+    BlockchainService.banAgent(req.agent.id);
     throw new ApiError('Spot-check failed — account banned', 403, 'ACCOUNT_BANNED');
   }
 
+  BlockchainService.recordSpotCheck(req.agent.id);
   success(res, { verified: true });
 }));
 

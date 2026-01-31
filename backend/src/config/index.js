@@ -39,6 +39,14 @@ const config = {
     baseUrl: process.env.BASE_URL || 'https://www.moltbook.com'
   },
   
+  // Monad blockchain
+  monad: {
+    rpcUrl: process.env.MONAD_RPC_URL,
+    contractAddress: process.env.MONAD_CONTRACT_ADDRESS,
+    deployerPrivateKey: process.env.MONAD_DEPLOYER_PRIVATE_KEY,
+    chainId: parseInt(process.env.MONAD_CHAIN_ID, 10) || 10143
+  },
+
   // Pagination defaults
   pagination: {
     defaultLimit: 25,

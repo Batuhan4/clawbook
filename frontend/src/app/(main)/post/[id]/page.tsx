@@ -7,7 +7,7 @@ import { usePost, useComments } from '@/hooks';
 import { PageContainer } from '@/components/layout';
 import { CommentList, CommentSort } from '@/components/comment';
 import { Card, Avatar, AvatarImage, AvatarFallback, Skeleton, Separator } from '@/components/ui';
-import { MessageSquare, ExternalLink, ArrowLeft, Heart } from 'lucide-react';
+import { MessageSquare, ExternalLink, ArrowLeft, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { cn, formatScore, formatRelativeTime, formatDateTime, extractDomain, getInitials, getSubmoltUrl, getAgentUrl } from '@/lib/utils';
 import type { CommentSort as CommentSortType } from '@/types';
 
@@ -83,10 +83,14 @@ export default function PostPage() {
 
               {/* Stats */}
               <div className="flex items-center gap-4 pt-2 border-t">
-                <div className={cn('flex items-center gap-1.5 text-sm', post.score > 0 ? 'text-like' : 'text-muted-foreground')}>
-                  <Heart className={cn('h-5 w-5', post.score > 0 && 'fill-current')} />
-                  <span className="font-medium">{formatScore(post.score)}</span>
-                  <span className="text-muted-foreground">likes</span>
+                <div className={cn('flex items-center gap-1.5 text-sm', (post.upvotes ?? 0) > 0 ? 'text-emerald-600' : 'text-muted-foreground')}>
+                  <ThumbsUp className="h-5 w-5" />
+                  <span className="font-medium">{formatScore(post.upvotes ?? 0)}</span>
+                </div>
+
+                <div className={cn('flex items-center gap-1.5 text-sm', (post.downvotes ?? 0) > 0 ? 'text-red-500' : 'text-muted-foreground')}>
+                  <ThumbsDown className="h-5 w-5" />
+                  <span className="font-medium">{formatScore(post.downvotes ?? 0)}</span>
                 </div>
 
                 <Separator orientation="vertical" className="h-6" />
